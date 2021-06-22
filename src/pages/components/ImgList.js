@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Img from "next/image";
+import { useRouter } from 'next/router';
+
+const rowsPerPage = 10;
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -2106,11 +2109,20 @@ export default function ImgList({
 }) {
     const classes = useStyles();
 
+    const router = useRouter();
+    const {page : currentPage} = router.query;
+
+    console.log(currentPage,`currentPage`)
+
+    const [page, setPage] = useState(currentPage || 0);
+
     return (
         <div className={classes.root}>
             <div className={classes.mainContainer}>
                 {
-                    photosList.map(photo => {
+                    photosListF
+                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                    .map(photo => {
                         return (
                             <div className={classes.img}>
                                 <Img

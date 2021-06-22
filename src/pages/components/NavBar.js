@@ -7,7 +7,7 @@ import InputBase from '@material-ui/core/InputBase';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
 import SearchIcon from '@material-ui/icons/Search';
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
 
 const useStyles = makeStyles((theme) => ({
   root: {
