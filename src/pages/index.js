@@ -9,7 +9,7 @@ export default function Home({
   res
 }) {
   const router = useRouter()
-  const { search } = router.query;
+  const { page: currentPage } = router.query;
 
   const [photosList, setPhotosList] = useState([]);
 
@@ -20,7 +20,9 @@ export default function Home({
     else if (Array.isArray(res.results)) {
       setPhotosList(res.results)
     }
-  }, [])
+  }, []);
+
+  const [page, setPage] = useState(Number(currentPage) || 1);
 
 
   return (
@@ -31,15 +33,17 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-        <NavBar
-          photosList={photosList}
-          setPhotosList={setPhotosList}
-        />
-
-        <ImgList
+      <NavBar
         photosList={photosList}
         setPhotosList={setPhotosList}
-        />
+      />
+
+      <ImgList
+        photosList={photosList}
+        setPhotosList={setPhotosList}
+        page={page}
+        setPage={setPage}
+      />
     </div>
   )
 }

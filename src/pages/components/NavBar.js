@@ -90,11 +90,12 @@ export default function NavBar({
     if(search){
       router.push(`/?search=${search}`);
       const {results} = await fetch(`/api/searchImage/?search=${search}`).then(res => res.json());
+      console.log(results,`results`)
       setPhotosList(results);
     }
     else{
-      router.push(`/`);
-      const {results} = await fetch("/api/fetchImage").then(res => res.json());
+      router.push(`/?page=1`);
+      const results = await fetch("/api/fetchImage").then(res => res.json());
       setPhotosList(results);
     }
   }, [search]);

@@ -5,9 +5,8 @@ import { searchPhotos } from "..";
 export default async function handler(req, res) {
   if(req.method === "GET"){
     try{
-      const apiRes = await searchPhotos(req.query);
-      const finlJson = await apiRes.json();
-      res.status(200).json(finlJson);
+      const apiRes = await searchPhotos(req.query.search);
+      res.status(200).json(apiRes);
     }
     catch{
       res.status(400).json([]);

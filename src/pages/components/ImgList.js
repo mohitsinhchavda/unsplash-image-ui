@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Img from "next/image";
 import { useRouter } from 'next/router';
+import Pagination from '@material-ui/lab/Pagination';
 
 const rowsPerPage = 10;
 
@@ -16,6 +17,11 @@ const useStyles = makeStyles((theme) => ({
     img: {
         margin: "4px",
         display: "inline-block",
+    },
+    paginationContainer: {
+        display: "flex",
+        justifyContent: "center",
+        padding: "16px"
     }
 }));
 
@@ -2106,38 +2112,59 @@ const photosListF = [
 export default function ImgList({
     photosList = [],
     setPhotosList,
+    page,
+    setPage,
 }) {
     const classes = useStyles();
 
     const router = useRouter();
-    const {page : currentPage} = router.query;
 
-    console.log(currentPage,`currentPage`)
+    const onPaginationChange = useCallback((_, newPage) => {
+        const { search } = router.query;
+        console.log(newPage, `newPage`)
+        setPage(newPage);
+        if (search) {
+            router.push(`/?search=${search}&page=${newPage}`);
+        }
+        else {
+            console.log(`PUSHING??????????`)
+            router.push(`/?page=${newPage}`);
+        }
+    }, [router, page]);
 
-    const [page, setPage] = useState(currentPage || 0);
+    console.log(page, `page con`)
 
     return (
         <div className={classes.root}>
             <div className={classes.mainContainer}>
                 {
-                    photosListF
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map(photo => {
-                        return (
-                            <div className={classes.img}>
-                                <Img
-                                    src={photo.urls.regular}
-                                    layout='fixed'
-                                    width={photo.width / 15}
-                                    height={photo.height / 15}
-                                    blurDataURL={photo.urls.thumb}
-                                    placeholder="blur"
-                                    key={photo.id}
-                                />
-                            </div>
-                        )
-                    })
+                    photosList
+                        .slice((page - 1) * rowsPerPage, (page - 1) * rowsPerPage + rowsPerPage)
+                        .map(photo => {
+                            return (
+                                <div className={classes.img}>
+                                    <Img
+                                        src={photo.urls.regular}
+                                        layout='fixed'
+                                        width={photo.width / 15}
+                                        height={photo.height / 15}
+                                        blurDataURL={photo.urls.thumb}
+                                        placeholder="blur"
+                                        key={photo.id}
+                                    />
+                                </div>
+                            )
+                        })
                 }
+            </div>
+            <div className={classes.paginationContainer}>
+                <Pagination
+                    count={Math.ceil(photosList.length/10)}
+                    size="large"
+                    onChange={onPaginationChange}
+                    page={page}
+                    defaultPage={page}
+                />
             </div>
         </div>
     );
