@@ -2110,7 +2110,7 @@ export default function ImgList({
         <div className={classes.root}>
             <div className={classes.mainContainer}>
                 {
-                    photosListF.map(photo => {
+                    photosList.map(photo => {
                         return (
                             <div className={classes.img}>
                                 <Img
@@ -2120,6 +2120,7 @@ export default function ImgList({
                                     height={photo.height / 15}
                                     blurDataURL={photo.urls.thumb}
                                     placeholder="blur"
+                                    key={photo.id}
                                 />
                             </div>
                         )

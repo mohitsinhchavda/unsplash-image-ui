@@ -70,7 +70,7 @@ export async function getServerSideProps(context) {
   }
 }
 
-async function fetchPhotos(page = 1) {
+export async function fetchPhotos(page = 1) {
   try {
     const res = await fetch(`${process.env.UNSPLASH_BASE_URL}/photos?page=${page}&per_page=30`, {
       headers: {
@@ -82,7 +82,6 @@ async function fetchPhotos(page = 1) {
     return res.json();
   }
   catch {
-    console.log(`COMING HERE`)
     return Promise.reject([])
   }
 }
@@ -97,7 +96,7 @@ export async function searchPhotos(search, page = 1) {
       }
     });
 
-    return res.body.json();
+    return res.json();
   }
   catch {
     return Promise.reject([])

@@ -87,9 +87,16 @@ export default function NavBar({
   }, []);
 
   const searchCallback = useCallback(async () => {
-    router.push(`/?search=${search}`);
-    const {results} = await fetch("/api/searchImage");
-    setPhotosList(results);
+    if(search){
+      router.push(`/?search=${search}`);
+      const {results} = await fetch(`/api/searchImage/?search=${search}`).then(res => res.json());
+      setPhotosList(results);
+    }
+    else{
+      router.push(`/`);
+      const {results} = await fetch("/api/fetchImage").then(res => res.json());
+      setPhotosList(results);
+    }
   }, [search]);
 
   console.log(photosList,`photosList`)
