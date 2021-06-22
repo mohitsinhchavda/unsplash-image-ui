@@ -1,11 +1,28 @@
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router'
 import Head from 'next/head';
 import styles from '../../styles/Home.module.css'
-import ImgSearch from './components/ImgSearch';
+import NavBar from './components/NavBar';
+import ImgList from "./components/ImgList";
 
 export default function Home({
   res
 }) {
-  console.log(res,`res`);
+  const router = useRouter()
+  const { search } = router.query;
+
+  const [photosList, setPhotosList] = useState([]);
+
+  useEffect(() => {
+    if (Array.isArray(res)) {
+      setPhotosList(res)
+    }
+    else if (Array.isArray(res.results)) {
+      setPhotosList(res.results)
+    }
+  }, [])
+
+
   return (
     <div className={styles.container}>
       <Head>
@@ -14,27 +31,33 @@ export default function Home({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <main className={styles.main}>
-        <ImgSearch/>
-      </main>
+        <NavBar
+          photosList={photosList}
+          setPhotosList={setPhotosList}
+        />
+
+        <ImgList
+        photosList={photosList}
+        setPhotosList={setPhotosList}
+        />
     </div>
   )
 }
 
 export async function getServerSideProps(context) {
 
-  const res = await fetch(`${process.env.UNSPLASH_BASE_URL}/photos`, {
-    headers : {
-      "content-type" : "application/json",
-      "accept" : "application/json",
-      "Authorization" : `Bearer ${process.env.UNSPLASH_OAUTH_TOKEN}`
-    }
-  });
+  const { search } = context.query;
 
-  const data = await res.json();
+  let res;
 
+  if (search) {
+    res = await searchPhotos(search).catch(() => []);
+  }
+  else {
+    res = await fetchPhotos().catch(() => []);
+  }
 
-  if (!data) {
+  if (!res) {
     return {
       notFound: true,
     }
@@ -42,7 +65,41 @@ export async function getServerSideProps(context) {
 
   return {
     props: {
-      res : data
+      res
     },
+  }
+}
+
+async function fetchPhotos(page = 1) {
+  try {
+    const res = await fetch(`${process.env.UNSPLASH_BASE_URL}/photos?page=${page}&per_page=30`, {
+      headers: {
+        "content-type": "application/json",
+        "accept": "application/json",
+        "Authorization": `Bearer ${process.env.UNSPLASH_OAUTH_TOKEN}`
+      }
+    });
+    return res.json();
+  }
+  catch {
+    console.log(`COMING HERE`)
+    return Promise.reject([])
+  }
+}
+
+export async function searchPhotos(search, page = 1) {
+  try {
+    const res = await fetch(`${process.env.UNSPLASH_BASE_URL}/search/photos?query=${search}&per_page=30&page=${page}`, {
+      headers: {
+        "content-type": "application/json",
+        "accept": "application/json",
+        "Authorization": `Bearer ${process.env.UNSPLASH_OAUTH_TOKEN}`
+      }
+    });
+
+    return res.body.json();
+  }
+  catch {
+    return Promise.reject([])
   }
 }
