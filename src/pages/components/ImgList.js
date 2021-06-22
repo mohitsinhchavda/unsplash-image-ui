@@ -2142,7 +2142,7 @@ export default function ImgList({
                         .slice((page - 1) * rowsPerPage, (page - 1) * rowsPerPage + rowsPerPage)
                         .map(photo => {
                             return (
-                                <div className={classes.img}>
+                                <div className={classes.img} key={photo.id}>
                                     <Img
                                         src={photo.urls.regular}
                                         layout='fixed'
@@ -2150,7 +2150,6 @@ export default function ImgList({
                                         height={photo.height / 15}
                                         blurDataURL={photo.urls.thumb}
                                         placeholder="blur"
-                                        key={photo.id}
                                     />
                                 </div>
                             )
