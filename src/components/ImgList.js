@@ -4,8 +4,6 @@ import Img from "next/image";
 import { useRouter } from 'next/router';
 import Pagination from '@material-ui/lab/Pagination';
 
-const rowsPerPage = 10;
-
 const useStyles = makeStyles((theme) => ({
     root: {
         flexGrow: 1,
@@ -2114,6 +2112,8 @@ export default function ImgList({
     setPhotosList,
     page,
     setPage,
+    rowsPerPage,
+    setStatus,
 }) {
     const classes = useStyles();
 
@@ -2121,18 +2121,21 @@ export default function ImgList({
 
     const onPaginationChange = useCallback((_, newPage) => {
         const { search } = router.query;
-        console.log(newPage, `newPage`)
         setPage(newPage);
         if (search) {
+            setStatus({
+                loading: true
+            });
             router.push(`/?search=${search}&page=${newPage}`);
         }
         else {
-            console.log(`PUSHING??????????`)
+            setStatus({
+                loading: true
+            });
             router.push(`/?page=${newPage}`);
         }
     }, [router, page]);
 
-    console.log(page, `page con`)
 
     return (
         <div className={classes.root}>
@@ -2158,11 +2161,13 @@ export default function ImgList({
             </div>
             <div className={classes.paginationContainer}>
                 <Pagination
-                    count={Math.ceil(photosList.length/10)}
+                    // count={Math.ceil(photosListF.length/10)}
+                    count={10}
                     size="large"
                     onChange={onPaginationChange}
                     page={page}
                     defaultPage={page}
+                    color="secondary"
                 />
             </div>
         </div>

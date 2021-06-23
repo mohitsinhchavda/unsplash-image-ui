@@ -6,14 +6,15 @@ import Typography from '@material-ui/core/Typography';
 import InputBase from '@material-ui/core/InputBase';
 import { fade, makeStyles } from '@material-ui/core/styles';
 import MenuIcon from '@material-ui/icons/Menu';
+import Button from '@material-ui/core/Button';
 import SearchIcon from '@material-ui/icons/Search';
 import { useRouter } from 'next/router';
 
 const useStyles = makeStyles((theme) => ({
   root: {
     flexGrow: 1,
-    position : "absolute",
-    top : 0,
+    position: "absolute",
+    top: 0,
     width: "100%"
   },
   menuButton: {
@@ -65,42 +66,53 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
+  btnRoot : {
+    marginLeft : 8,
+    color: theme.palette.primary.main
+  }
 }));
 
 export default function NavBar({
   photosList,
   setPhotosList,
+  setStatus,
 }) {
   const classes = useStyles();
 
-  const [search, setSearch] = useState();
+  const [searchQuery, setSearchQuery] = useState();
 
   const onSearch = useCallback((e) => {
-    setSearch(e.target.value);
+    setSearchQuery(e.target.value);
   }, []);
 
   const router = useRouter();
-  const {search : searchUriVal} = router.query;
+  const { search: searchUriVal } = router.query;
 
   useEffect(() => {
-    setSearch(searchUriVal);
+    setSearchQuery(searchUriVal);
   }, []);
 
   const searchCallback = useCallback(async () => {
-    if(search){
-      router.push(`/?search=${search}`);
-      const {results} = await fetch(`/api/searchImage/?search=${search}`).then(res => res.json());
-      console.log(results,`results`)
+    setStatus({
+      loading: true
+    });
+    if (searchQuery) {
+      router.push(`/?search=${searchQuery}`);
+      const { results = [] } = await fetch(`/api/searchImage/?search=${searchQuery}`).then(res => res.json());
       setPhotosList(results);
     }
-    else{
+    else {
       router.push(`/?page=1`);
-      const results = await fetch("/api/fetchImage").then(res => res.json());
-      setPhotosList(results);
+      const results = await fetch(`/api/fetchImage`).then(res => res.json());
+      setPhotosList(results || []);
     }
-  }, [search]);
+  }, [searchQuery]);
 
-  console.log(photosList,`photosList`)
+  const onInputBlur = useCallback(() => {
+    if (!searchQuery) {
+      router.push(`/?page=1`);
+    }
+  }, [searchQuery]);
 
   return (
     <div className={classes.root}>
@@ -122,17 +134,28 @@ export default function NavBar({
               <SearchIcon />
             </div>
             <InputBase
-              placeholder="Search…"
+              placeholder="Type here..."
               classes={{
                 root: classes.inputRoot,
                 input: classes.inputInput,
               }}
               inputProps={{ 'aria-label': 'search' }}
               onChange={onSearch}
-              value={search}
-              onBlur={searchCallback}
+              value={searchQuery}
+              onBlur={onInputBlur}
+              autoFocus
             />
           </div>
+          <Button
+            variant="contained"
+            classes={{
+              root : classes.btnRoot
+            }}
+            onClick={searchCallback}
+            disableFocusRipple
+          >
+            Search
+          </Button>
         </Toolbar>
       </AppBar>
     </div>
