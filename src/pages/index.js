@@ -23,21 +23,27 @@ export default function Home({
     loading: false,
   });
 
-  useEffect(async () => {
+  useEffect(() => {
     if (Array.isArray(res)) {
       // on refresh if page has less than current page no. data
       // then fetch it
       if (res.length !== 0 && res.length <= currentPage * rowsPerPage) {
-        const newApiRes = await fetch(`/api/fetchImage/?page=${currentPage}`);
-        const newRes = await newApiRes.json();
-        setPhotosList([...res, ...newRes]);
+        async function fetchAndSetData(){
+          const newApiRes = await fetch(`/api/fetchImage/?page=${currentPage}`);
+          const newRes = await newApiRes.json();
+          setPhotosList([...res, ...newRes]);
+          setStatus({
+            loading: false
+          });
+        }
+        fetchAndSetData();
       }
       else {
         setPhotosList(res);
+        setStatus({
+          loading: false
+        });
       }
-      setStatus({
-        loading: false
-      });
     }
     else if (Array.isArray(res.results)) {
       setPhotosList(res.results);
@@ -47,31 +53,34 @@ export default function Home({
     }
   }, []);
 
-  useEffect(async () => {
+  useEffect(() => {
 
     if (currentPage && photosList.length !== 0 && photosList.length < currentPage * rowsPerPage) {
 
-      setStatus({
-        loading: true
-      });
-
-      let newRes;
-
-      if (searchQueryUri) {
-        const newApiRes = await fetch(`/api/searchImage/?search=${searchQueryUri}&page=${currentPage}`);
-        const { results = [] } = await newApiRes.json();
-        newRes = [...results];
+      async function fetchAndSetData(){
+        setStatus({
+          loading: true
+        });
+  
+        let newRes;
+  
+        if (searchQueryUri) {
+          const newApiRes = await fetch(`/api/searchImage/?search=${searchQueryUri}&page=${currentPage}`);
+          const { results = [] } = await newApiRes.json();
+          newRes = [...results];
+        }
+        else{
+          const newApiRes = await fetch(`/api/fetchImage/?page=${currentPage}`);
+          newRes = await newApiRes.json();
+        }
+  
+        setPhotosList((prevPhotoList) => [...prevPhotoList, ...newRes || []]);
+  
+        setStatus({
+          loading: false
+        });
       }
-      else{
-        const newApiRes = await fetch(`/api/fetchImage/?page=${currentPage}`);
-        newRes = await newApiRes.json();
-      }
-
-      setPhotosList((prevPhotoList) => [...prevPhotoList, ...newRes || []]);
-
-      setStatus({
-        loading: false
-      });
+      fetchAndSetData();
     }
     else {
       setStatus({
