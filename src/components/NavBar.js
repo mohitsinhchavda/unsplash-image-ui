@@ -97,8 +97,8 @@ export default function NavBar({
       loading: true
     });
     if (searchQuery) {
-      router.push(`/?search=${searchQuery}`);
-      const { results = [] } = await fetch(`/api/searchImage/?search=${searchQuery}`).then(res => res.json());
+      router.push(`/?search=${searchQuery}&page=1`);
+      const { results = [] } = await fetch(`/api/searchImage/?search=${searchQuery}&page=1`).then(res => res.json());
       setPhotosList(results);
     }
     else {
