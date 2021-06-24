@@ -66,40 +66,46 @@ const useStyles = makeStyles((theme) => ({
       },
     },
   },
-  btnRoot : {
-    marginLeft : 8,
+  btnRoot: {
+    marginLeft: 8,
     color: theme.palette.primary.main
   }
 }));
 
-export default function NavBar(props) {
+export default function NavBar({
+  setPage
+}) {
   const classes = useStyles();
 
-  const [searchQuery, setSearchQuery] = useState();
+  const [searchQuery, setSearchQuery] = useState("");
 
   const onSearch = useCallback((e) => {
     setSearchQuery(e.target.value);
   }, []);
 
   const router = useRouter();
-  const { search: searchUriVal } = router.query;
+  const { search: searchUriVal = "" } = router.query;
 
   useEffect(() => {
     setSearchQuery(searchUriVal);
-  }, []);
+  }, [searchUriVal]);
 
-  const searchCallback = useCallback(async () => {
+  const searchCallback = useCallback(async (event) => {
+    event.preventDefault();
     if (searchQuery) {
-      router.push(`/?search=${searchQuery}&page=1`);
+      router.push(`/?search=${searchQuery}`);
+      setPage(1);
     }
     else {
-      router.push(`/?page=1`);
+      router.push(`/`);
+      setPage(1);
     }
   }, [searchQuery]);
 
   const onInputBlur = useCallback(() => {
     if (!searchQuery) {
-      router.push(`/?page=1`);
+      router.push(`/`);
+      setPage(1);
     }
   }, [searchQuery]);
 
@@ -118,33 +124,35 @@ export default function NavBar(props) {
           <Typography className={classes.title} variant="h6" noWrap>
             Unsplash Images
           </Typography>
-          <div className={classes.search}>
-            <div className={classes.searchIcon}>
-              <SearchIcon />
+          <form style={{display : "contents"}} onSubmit={searchCallback}>
+            <div className={classes.search}>
+              <div className={classes.searchIcon}>
+                <SearchIcon />
+              </div>
+              <InputBase
+                placeholder="Type here..."
+                classes={{
+                  root: classes.inputRoot,
+                  input: classes.inputInput,
+                }}
+                inputProps={{ 'aria-label': 'search' }}
+                onChange={onSearch}
+                value={searchQuery}
+                onBlur={onInputBlur}
+                autoFocus
+              />
             </div>
-            <InputBase
-              placeholder="Type here..."
+            <Button
+              variant="contained"
               classes={{
-                root: classes.inputRoot,
-                input: classes.inputInput,
+                root: classes.btnRoot
               }}
-              inputProps={{ 'aria-label': 'search' }}
-              onChange={onSearch}
-              value={searchQuery}
-              onBlur={onInputBlur}
-              autoFocus
-            />
-          </div>
-          <Button
-            variant="contained"
-            classes={{
-              root : classes.btnRoot
-            }}
-            onClick={searchCallback}
-            disableFocusRipple
-          >
-            Search
-          </Button>
+              disableFocusRipple
+              type="submit"
+            >
+              Search
+            </Button>
+          </form>
         </Toolbar>
       </AppBar>
     </div>

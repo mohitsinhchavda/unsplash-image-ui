@@ -1,7 +1,6 @@
 import React, { useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Img from "next/image";
-import { useRouter } from 'next/router';
 import Pagination from '@material-ui/lab/Pagination';
 
 const useStyles = makeStyles((theme) => ({
@@ -2109,32 +2108,26 @@ const photosListF = [
 
 export default function ImgList({
     photosList = [],
-    page = 1,
+    page,
+    setPage,
     rowsPerPage,
 }) {
     const classes = useStyles();
 
-    const router = useRouter();
-
     const onPaginationChange = useCallback((_, newPage) => {
-        const { search } = router.query;
-        if (search) {
-            router.push(`/?search=${search}&page=${newPage}`);
+        if(page != newPage){
+            setPage(newPage);
         }
-        else {
-            router.push(`/?page=${newPage}`);
-        }
-    }, [router, page]);
+    }, [page]);
 
-    console.log(page,`page`)
-
+    console.log(photosList,`photosList`)
 
     return (
         <div className={classes.root}>
             <div className={classes.mainContainer}>
                 {
                     photosList
-                        .slice((page - 1) * rowsPerPage, (page - 1) * rowsPerPage + rowsPerPage)
+                        // .slice((page - 1) * rowsPerPage, (page - 1) * rowsPerPage + rowsPerPage)
                         .map(photo => {
                             return (
                                 <div className={classes.img} key={photo.id}>

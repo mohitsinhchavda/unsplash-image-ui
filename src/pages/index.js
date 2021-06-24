@@ -6,18 +6,26 @@ import Loader from "../components/Loader";
 import NoDataComponent from "../components/NoDataComponent";
 import ImgList from "../components/ImgList";
 import useSWR from 'swr';
+import { useState } from 'react';
 
 const rowsPerPage = 10;
 
+const fetcher = url => fetch(url).then(r => r.json());
 
 export default function Home(props) {
   const router = useRouter()
-  const { page, search: searchQueryUri } = router.query;
+  const { search: searchQueryUri } = router.query;
+
+  const [page, setPage] = useState(1);
 
   const {
     data,
   } = useSWR(
-    `/api/${searchQueryUri ? "searchImage" : "fetchImage"}?page=${page || 1}&per_page=30${searchQueryUri ? "&"+searchQueryUri : ""}`
+    `/api/${searchQueryUri ? "searchImage" : "fetchImage"}?page=${page}${searchQueryUri ? "&"+"query="+searchQueryUri : ""}`,
+    fetcher,
+    {
+      revalidateOnFocus : false
+    }
   );
 
   return (
@@ -29,6 +37,7 @@ export default function Home(props) {
       </Head>
 
       <NavBar
+        setPage={setPage}
       />
 
       {
@@ -43,6 +52,7 @@ export default function Home(props) {
             <ImgList
               photosList={data}
               page={page}
+              setPage={setPage}
               rowsPerPage={rowsPerPage}
             />
       }
