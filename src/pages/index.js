@@ -1,32 +1,12 @@
-import { useRouter } from 'next/router'
+import { useState } from 'react';
 import Head from 'next/head';
 import styles from '../../styles/Home.module.css'
 import NavBar from '../components/NavBar';
-import Loader from "../components/Loader";
-import NoDataComponent from "../components/NoDataComponent";
-import ImgList from "../components/ImgList";
-import useSWR from 'swr';
-import { useState } from 'react';
-
-const rowsPerPage = 10;
-
-const fetcher = url => fetch(url).then(r => r.json());
+import ImgListContainer from "../components/ImgListContainer";
 
 export default function Home(props) {
-  const router = useRouter()
-  const { search: searchQueryUri } = router.query;
 
   const [page, setPage] = useState(1);
-
-  const {
-    data,
-  } = useSWR(
-    `/api/${searchQueryUri ? "searchImage" : "fetchImage"}?page=${page}${searchQueryUri ? "&"+"query="+searchQueryUri : ""}`,
-    fetcher,
-    {
-      revalidateOnFocus : false
-    }
-  );
 
   return (
     <div className={styles.container}>
@@ -39,50 +19,10 @@ export default function Home(props) {
       <NavBar
         setPage={setPage}
       />
-
-      {
-        !data
-          ?
-          <Loader />
-          :
-          !data || !Array.isArray(data) || (Array.isArray(data) && data.length === 0)
-            ?
-            <NoDataComponent />
-            :
-            <ImgList
-              photosList={data}
-              page={page}
-              setPage={setPage}
-              rowsPerPage={rowsPerPage}
-            />
-      }
+      <ImgListContainer
+        page={page}
+        setPage={setPage}
+      />
     </div>
   )
 }
-/*
-export async function getServerSideProps(context) {
-
-  const { search, page } = context.query;
-
-  let res;
-
-  if (search) {
-    res = await searchPhotos(search).catch(() => []);
-  }
-  else {
-    res = await fetchPhotos(page || 1).catch(() => []);
-  }
-
-  if (!res) {
-    return {
-      notFound: true,
-    }
-  }
-
-  return {
-    props: {
-      res
-    },
-  }
-}
-*/
