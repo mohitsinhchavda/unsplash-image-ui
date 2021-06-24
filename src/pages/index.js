@@ -6,7 +6,8 @@ import NavBar from '../components/NavBar';
 import Loader from "../components/Loader";
 import NoDataComponent from "../components/NoDataComponent";
 import ImgList from "../components/ImgList";
-import { fetchPhotos, searchPhotos } from '../api';
+import { fetchPhotos, searchPhotos } from '../apiUtilityFuncs';
+import useSWR from 'swr';
 
 const rowsPerPage = 10;
 
@@ -19,78 +20,17 @@ export default function Home({
 
   const [photosList, setPhotosList] = useState([]);
 
-  const [status, setStatus] = useState({
-    loading: false,
-  });
-
-  useEffect(() => {
-    if (Array.isArray(res)) {
-      // on refresh if page has less than current page no. data
-      // then fetch it
-      if (res.length !== 0 && res.length <= currentPage * rowsPerPage) {
-        async function fetchAndSetData(){
-          const newApiRes = await fetch(`/api/fetchImage/?page=${currentPage}`);
-          const newRes = await newApiRes.json();
-          setPhotosList([...res, ...newRes]);
-          setStatus({
-            loading: false
-          });
-        }
-        fetchAndSetData();
-      }
-      else {
-        setPhotosList(res);
-        setStatus({
-          loading: false
-        });
-      }
-    }
-    else if (Array.isArray(res.results)) {
-      setPhotosList(res.results);
-      setStatus({
-        loading: false
-      });
-    }
-  }, []);
-
-  useEffect(() => {
-
-    if (currentPage && photosList.length !== 0 && photosList.length < currentPage * rowsPerPage) {
-
-      async function fetchAndSetData(){
-        setStatus({
-          loading: true
-        });
-  
-        let newRes;
-  
-        if (searchQueryUri) {
-          const newApiRes = await fetch(`/api/searchImage/?search=${searchQueryUri}&page=${currentPage}`);
-          const { results = [] } = await newApiRes.json();
-          newRes = [...results];
-        }
-        else{
-          const newApiRes = await fetch(`/api/fetchImage/?page=${currentPage}`);
-          newRes = await newApiRes.json();
-        }
-  
-        setPhotosList((prevPhotoList) => [...prevPhotoList, ...newRes || []]);
-  
-        setStatus({
-          loading: false
-        });
-      }
-      fetchAndSetData();
-    }
-    else {
-      setStatus({
-        loading: false
-      });
-    }
-
-  }, [currentPage, photosList, searchQueryUri])
-
   const [page, setPage] = useState(Number(currentPage) || 1);
+
+  const {
+    data,
+  } = useSWR(
+    `/api/${searchQueryUri ? "searchImage" : "fetchImage"}?page=${currentPage || 1}&per_page=30${searchQueryUri ? "&"+searchQueryUri : ""}`
+  );
+
+  useEffect(() => {
+    setPhotosList(data);
+  }, [data])
 
 
   return (
@@ -104,11 +44,10 @@ export default function Home({
       <NavBar
         photosList={photosList}
         setPhotosList={setPhotosList}
-        setStatus={setStatus}
       />
 
       {
-        status.loading
+        !data
           ?
           <Loader />
           :
@@ -122,13 +61,12 @@ export default function Home({
               page={page}
               setPage={setPage}
               rowsPerPage={rowsPerPage}
-              setStatus={setStatus}
             />
       }
     </div>
   )
 }
-
+/*
 export async function getServerSideProps(context) {
 
   const { search, page } = context.query;
@@ -154,3 +92,4 @@ export async function getServerSideProps(context) {
     },
   }
 }
+*/
