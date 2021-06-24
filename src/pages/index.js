@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router'
 import Head from 'next/head';
 import styles from '../../styles/Home.module.css'
@@ -6,32 +5,20 @@ import NavBar from '../components/NavBar';
 import Loader from "../components/Loader";
 import NoDataComponent from "../components/NoDataComponent";
 import ImgList from "../components/ImgList";
-import { fetchPhotos, searchPhotos } from '../apiUtilityFuncs';
 import useSWR from 'swr';
 
 const rowsPerPage = 10;
 
 
-export default function Home({
-  res
-}) {
+export default function Home(props) {
   const router = useRouter()
-  const { page: currentPage, search: searchQueryUri } = router.query;
-
-  const [photosList, setPhotosList] = useState([]);
-
-  const [page, setPage] = useState(Number(currentPage) || 1);
+  const { page, search: searchQueryUri } = router.query;
 
   const {
     data,
   } = useSWR(
-    `/api/${searchQueryUri ? "searchImage" : "fetchImage"}?page=${currentPage || 1}&per_page=30${searchQueryUri ? "&"+searchQueryUri : ""}`
+    `/api/${searchQueryUri ? "searchImage" : "fetchImage"}?page=${page || 1}&per_page=30${searchQueryUri ? "&"+searchQueryUri : ""}`
   );
-
-  useEffect(() => {
-    setPhotosList(data);
-  }, [data])
-
 
   return (
     <div className={styles.container}>
@@ -42,8 +29,6 @@ export default function Home({
       </Head>
 
       <NavBar
-        photosList={photosList}
-        setPhotosList={setPhotosList}
       />
 
       {
@@ -51,15 +36,13 @@ export default function Home({
           ?
           <Loader />
           :
-          !photosList || !Array.isArray(photosList) || (Array.isArray(photosList) && photosList.length === 0)
+          !data || !Array.isArray(data) || (Array.isArray(data) && data.length === 0)
             ?
             <NoDataComponent />
             :
             <ImgList
-              photosList={photosList}
-              setPhotosList={setPhotosList}
+              photosList={data}
               page={page}
-              setPage={setPage}
               rowsPerPage={rowsPerPage}
             />
       }

@@ -2109,11 +2109,8 @@ const photosListF = [
 
 export default function ImgList({
     photosList = [],
-    setPhotosList,
-    page,
-    setPage,
+    page = 1,
     rowsPerPage,
-    setStatus,
 }) {
     const classes = useStyles();
 
@@ -2121,20 +2118,15 @@ export default function ImgList({
 
     const onPaginationChange = useCallback((_, newPage) => {
         const { search } = router.query;
-        setPage(newPage);
         if (search) {
-            setStatus({
-                loading: true
-            });
             router.push(`/?search=${search}&page=${newPage}`);
         }
         else {
-            setStatus({
-                loading: true
-            });
             router.push(`/?page=${newPage}`);
         }
     }, [router, page]);
+
+    console.log(page,`page`)
 
 
     return (

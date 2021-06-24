@@ -72,11 +72,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function NavBar({
-  photosList,
-  setPhotosList,
-  setStatus,
-}) {
+export default function NavBar(props) {
   const classes = useStyles();
 
   const [searchQuery, setSearchQuery] = useState();
@@ -93,18 +89,11 @@ export default function NavBar({
   }, []);
 
   const searchCallback = useCallback(async () => {
-    setStatus({
-      loading: true
-    });
     if (searchQuery) {
       router.push(`/?search=${searchQuery}&page=1`);
-      const { results = [] } = await fetch(`/api/searchImage/?search=${searchQuery}&page=1`).then(res => res.json());
-      setPhotosList(results);
     }
     else {
       router.push(`/?page=1`);
-      const results = await fetch(`/api/fetchImage`).then(res => res.json());
-      setPhotosList(results || []);
     }
   }, [searchQuery]);
 
