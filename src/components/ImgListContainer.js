@@ -1,9 +1,10 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Pagination from '@material-ui/lab/Pagination';
 import ImgList from "./ImgList";
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
+import { usePrevious } from '../hooks';
 
 const fetcher = url => fetch(url).then(r => r.json());
 
@@ -2130,6 +2131,16 @@ export default function ImgListContainer({
         }
     }, [page, setPage]);
 
+    const [totalPagesCount, setTotalPagesCount] = useState();
+
+    const previousSearchQueryUri = usePrevious(searchQueryUri);
+
+    useEffect(() => {
+        if ((total != totalPagesCount && data) || previousSearchQueryUri !== searchQueryUri) {
+            setTotalPagesCount(total);
+        }
+    }, [total, totalPagesCount, setTotalPagesCount, data, searchQueryUri, previousSearchQueryUri]);
+
     return (
         <div className={classes.root}>
             <div>
@@ -2140,14 +2151,20 @@ export default function ImgListContainer({
                 />
             </div>
             <div className={classes.paginationContainer}>
-                <Pagination
-                    count={Math.ceil((Number(total)) / 10)}
-                    size="large"
-                    onChange={onPaginationChange}
-                    page={page}
-                    defaultPage={page}
-                    color="secondary"
-                />
+                {
+                    Array.isArray(data)
+                        ?
+                        <Pagination
+                            count={Math.ceil((Number(totalPagesCount)) / 10)}
+                            size="large"
+                            onChange={onPaginationChange}
+                            page={page}
+                            defaultPage={page}
+                            color="secondary"
+                        />
+                        :
+                        null
+                }
             </div>
         </div>
     );

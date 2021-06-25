@@ -8,8 +8,13 @@ const useStyles = makeStyles((theme) => ({
         '& > * + *': {
             marginLeft: theme.spacing(2),
         },
-        height : "80vh"
+        height : "80vh",
+        justifyContent : "center",
+        alignItems : "center"
     },
+    typography : {
+        width : "70%"
+    }
 }));
 
 export default function CircularIndeterminate() {
@@ -17,7 +22,7 @@ export default function CircularIndeterminate() {
 
     return (
         <div className={classes.root}>
-            <Typography variant="h4">
+            <Typography variant="h5" className={classes.typography} align="center">
                 No Images available, because the limit of unsplash API (50 Req./Hr) exhausted, Please try again after 1 hour.
             </Typography>
         </div>

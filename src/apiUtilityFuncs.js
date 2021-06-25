@@ -19,7 +19,7 @@ export async function commoUnsplashFetchUtilFunc(action = "list", paramsArgs) {
   }
 }
 
-export function parseQueryObjToString(params = {}) {
+function parseQueryObjToString(params = {}) {
   return Object.keys(params)
       .map(key => `${key}=${params[key]}`)
       .join('&');
