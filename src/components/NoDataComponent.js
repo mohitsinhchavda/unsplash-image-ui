@@ -8,6 +8,7 @@ const useStyles = makeStyles((theme) => ({
         '& > * + *': {
             marginLeft: theme.spacing(2),
         },
+        height : "80vh"
     },
 }));
 
