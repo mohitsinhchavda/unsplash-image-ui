@@ -17,8 +17,8 @@ export default function CircularIndeterminate() {
 
     return (
         <div className={classes.root}>
-            <Typography variant="h3">
-                No Images available.
+            <Typography variant="h4">
+                No Images available, because the limit of unsplash API (50 Req./Hr) exhausted, Please try again after 1 hour.
             </Typography>
         </div>
     );
