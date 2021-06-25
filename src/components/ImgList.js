@@ -13,6 +13,7 @@ const useStyles = makeStyles((theme) => ({
 export default function ImgList({
     data,
     resultsArr,
+    error,
 }) {
 
     const classes = useStyles();
@@ -22,7 +23,7 @@ export default function ImgList({
             ?
             <Loader />
             :
-            !Array.isArray(resultsArr) || (Array.isArray(resultsArr) && resultsArr.length === 0)
+            error || !Array.isArray(resultsArr) || (Array.isArray(resultsArr) && resultsArr.length === 0)
                 ?
                 <NoDataComponent />
                 :

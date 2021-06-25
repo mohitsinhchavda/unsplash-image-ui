@@ -2115,6 +2115,7 @@ export default function ImgListContainer({
     const {
         data: { resultsArr = [], total = 0 } = {},
         data,
+        error,
     } = useSWR(
         `/api/${searchQueryUri ? "searchImage" : "fetchImage"}?page=${page}${searchQueryUri ? "&" + "query=" + searchQueryUri : ""}`,
         fetcher,
@@ -2135,6 +2136,7 @@ export default function ImgListContainer({
                 <ImgList
                     resultsArr={resultsArr}
                     data={data}
+                    error={error}
                 />
             </div>
             <div className={classes.paginationContainer}>

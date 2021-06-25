@@ -8,7 +8,10 @@ export default async function handler(req, res) {
       res.status(200).json({resultsArr : finalRes, total : apiRes.headers.get("x-total")});
     }
     catch(error){
-      res.status(400).json([]);
+      res.status(400).json({
+        resultsArr : [],
+        total : 0
+      });
     }
   }
 }
