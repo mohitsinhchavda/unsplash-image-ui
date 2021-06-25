@@ -1,11 +1,7 @@
 import Img from "next/image";
-import useSWR from 'swr';
 import Loader from "./Loader";
 import NoDataComponent from "./NoDataComponent";
-import { useRouter } from 'next/router';
 import { makeStyles } from '@material-ui/core/styles';
-
-const fetcher = url => fetch(url).then(r => r.json());
 
 const useStyles = makeStyles((theme) => ({
     img: {
@@ -15,33 +11,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function ImgList({
-    page,
+    data,
+    resultsArr,
 }) {
 
     const classes = useStyles();
-
-    const router = useRouter();
-    const { search: searchQueryUri } = router.query;
-    const {
-        data,
-    } = useSWR(
-        `/api/${searchQueryUri ? "searchImage" : "fetchImage"}?page=${page}${searchQueryUri ? "&" + "query=" + searchQueryUri : ""}`,
-        fetcher,
-        {
-            revalidateOnFocus: false
-        }
-    );
 
     return (
         !data
             ?
             <Loader />
             :
-            !data || !Array.isArray(data) || (Array.isArray(data) && data.length === 0)
+            !Array.isArray(resultsArr) || (Array.isArray(resultsArr) && resultsArr.length === 0)
                 ?
                 <NoDataComponent />
                 :
-                data
+                resultsArr
                     .map(photo => {
                         return (
                             <div className={classes.img} key={photo.id}>

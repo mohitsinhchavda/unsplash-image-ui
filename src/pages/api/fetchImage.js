@@ -5,10 +5,9 @@ export default async function handler(req, res) {
     try{
       const apiRes = await commoUnsplashFetchUtilFunc("list", req.query);
       const finalRes = await apiRes.json();
-      res.status(200).json(finalRes);
+      res.status(200).json({resultsArr : finalRes, total : apiRes.headers.get("x-total")});
     }
     catch(error){
-      console.error(error,`error printed`)
       res.status(400).json([]);
     }
   }

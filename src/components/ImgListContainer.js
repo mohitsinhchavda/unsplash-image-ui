@@ -2,6 +2,10 @@ import React, { useCallback } from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Pagination from '@material-ui/lab/Pagination';
 import ImgList from "./ImgList";
+import { useRouter } from 'next/router';
+import useSWR from 'swr';
+
+const fetcher = url => fetch(url).then(r => r.json());
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -2106,21 +2110,36 @@ export default function ImgListContainer({
 }) {
     const classes = useStyles();
 
+    const router = useRouter();
+    const { search: searchQueryUri } = router.query;
+    const {
+        data: { resultsArr = [], total = 0 } = {},
+        data,
+    } = useSWR(
+        `/api/${searchQueryUri ? "searchImage" : "fetchImage"}?page=${page}${searchQueryUri ? "&" + "query=" + searchQueryUri : ""}`,
+        fetcher,
+        {
+            revalidateOnFocus: false
+        }
+    );
+
     const onPaginationChange = useCallback((_, newPage) => {
         if (page != newPage) {
             setPage(newPage);
         }
-    }, [page]);
+    }, [page, setPage]);
 
     return (
         <div className={classes.root}>
             <div>
-                <ImgList page={page} />
+                <ImgList
+                    resultsArr={resultsArr}
+                    data={data}
+                />
             </div>
             <div className={classes.paginationContainer}>
                 <Pagination
-                    // count={Math.ceil(photosListF.length/10)}
-                    count={10}
+                    count={Math.ceil((Number(total)) / 10)}
                     size="large"
                     onChange={onPaginationChange}
                     page={page}

@@ -100,14 +100,14 @@ export default function NavBar({
       router.push(`/`);
       setPage(1);
     }
-  }, [searchQuery]);
+  }, [searchQuery, router, setPage]);
 
   const onInputBlur = useCallback(() => {
     if (!searchQuery) {
       router.push(`/`);
       setPage(1);
     }
-  }, [searchQuery]);
+  }, [searchQuery, router, setPage]);
 
   return (
     <div className={classes.root}>
