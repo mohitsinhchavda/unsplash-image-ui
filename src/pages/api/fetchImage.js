@@ -9,7 +9,11 @@ export default async function handler(req, res) {
     }
     catch(error){
       res.status(400).json({
-        resultsArr : [],
+        resultsArr : {
+          errors : [
+            "Limit Exhausted"
+          ]
+        },
         total : 0
       });
     }
