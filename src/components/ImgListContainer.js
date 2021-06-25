@@ -2152,7 +2152,7 @@ export default function ImgListContainer({
             </div>
             <div className={classes.paginationContainer}>
                 {
-                    Array.isArray(data)
+                    !(data?.resultsArr?.errors)
                         ?
                         <Pagination
                             count={Math.ceil((Number(totalPagesCount)) / 10)}
